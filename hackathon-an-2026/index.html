@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Éclaireur — Votre projet face à la loi : anticiper, s'adapter, proposer</title>
+<style>
+:root{
+  --an-navy:#1D2C49;        /* bleu profond header AN */
+  --an-navy-2:#253C6E;      /* bleu secondaire */
+  --an-blue:#3B5591;        /* bleu liens / boutons */
+  --an-blue-light:#EDF1F8;  /* fond bleuté clair */
+  --an-gold:#C9A961;        /* doré palais Bourbon */
+  --fr-blue:#000091;
+  --fr-red:#E1000F;
+  --bg:#F5F5F2;
+  --card:#FFFFFF;
+  --text:#1B1B1B;
+  --muted:#5A6474;
+  --border:#DDE2EA;
+  --ok:#1E7A46;
+  --warn:#B34700;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:"Segoe UI",system-ui,-apple-system,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.55}
+.serif{font-family:Georgia,"Times New Roman",serif}
+
+/* ---- Bandeau tricolore + header ---- */
+.tricolore{height:4px;display:flex}
+.tricolore span{flex:1}
+.tricolore span:nth-child(1){background:var(--fr-blue)}
+.tricolore span:nth-child(2){background:#fff}
+.tricolore span:nth-child(3){background:var(--fr-red)}
+header{background:var(--an-navy);color:#fff;padding:26px 24px 22px}
+.header-inner{max-width:1060px;margin:0 auto;display:flex;align-items:center;gap:18px}
+.hemicycle{flex:none}
+header h1{font-size:1.55rem;font-weight:600;letter-spacing:.3px}
+header h1 .serif{font-style:italic;color:var(--an-gold)}
+header .sub{color:#C7D0E2;font-size:.92rem;margin-top:3px}
+.badge-legis{margin-left:auto;text-align:right;font-size:.78rem;color:#C7D0E2;border-left:1px solid #3A4C74;padding-left:16px;line-height:1.4}
+.badge-legis b{color:#fff;display:block;font-size:.85rem}
+
+/* ---- Barre d'étapes ---- */
+.steps{background:var(--an-navy-2);padding:0 24px}
+.steps-inner{max-width:1060px;margin:0 auto;display:flex;gap:0;overflow-x:auto}
+.step{padding:11px 18px;color:#AEBBD6;font-size:.85rem;white-space:nowrap;border-bottom:3px solid transparent;display:flex;align-items:center;gap:8px}
+.step .num{width:20px;height:20px;border-radius:50%;background:#3A4C74;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:.72rem}
+.step.active{color:#fff;border-bottom-color:var(--an-gold)}
+.step.active .num{background:var(--an-gold);color:var(--an-navy)}
+.step.done .num{background:var(--ok)}
+
+main{max-width:1060px;margin:0 auto;padding:28px 24px 60px}
+h2.section{font-family:Georgia,serif;font-size:1.25rem;color:var(--an-navy);margin:34px 0 6px;display:flex;align-items:center;gap:10px}
+h2.section::after{content:"";flex:1;height:1px;background:var(--border)}
+.section-sub{color:var(--muted);font-size:.9rem;margin-bottom:16px}
+
+/* ---- Cartes ---- */
+.card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:22px;box-shadow:0 1px 3px rgba(29,44,73,.06)}
+.card h3{font-family:Georgia,serif;color:var(--an-navy);font-size:1.02rem;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.card h3 .pastille{width:26px;height:26px;border-radius:50%;background:var(--an-blue-light);display:inline-flex;align-items:center;justify-content:center;font-size:.85rem}
+
+/* ---- Encart d'entrée ---- */
+.entry{display:grid;grid-template-columns:1fr 300px;gap:18px}
+@media(max-width:820px){.entry{grid-template-columns:1fr}}
+textarea{width:100%;min-height:150px;padding:13px;border:1px solid var(--border);border-radius:5px;font:inherit;font-size:.93rem;resize:vertical}
+textarea:focus{outline:2px solid var(--an-blue);border-color:var(--an-blue)}
+.dropzone{border:2px dashed var(--an-blue);border-radius:6px;background:var(--an-blue-light);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:18px;cursor:pointer;transition:.15s;min-height:150px}
+.dropzone:hover,.dropzone.over{background:#DFE7F5}
+.dropzone .ico{font-size:1.7rem;margin-bottom:6px}
+.dropzone p{font-size:.84rem;color:var(--an-navy)}
+.dropzone small{color:var(--muted);font-size:.74rem;margin-top:5px}
+.file-chip{margin-top:10px;background:var(--an-navy);color:#fff;font-size:.78rem;padding:4px 12px;border-radius:20px;display:none}
+.exemples{margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.exemples span{font-size:.8rem;color:var(--muted)}
+.chip{border:1px solid var(--an-blue);color:var(--an-blue);background:#fff;border-radius:20px;padding:4px 13px;font-size:.8rem;cursor:pointer}
+.chip:hover{background:var(--an-blue);color:#fff}
+
+.btn{display:inline-flex;align-items:center;gap:9px;background:var(--an-navy);color:#fff;border:none;border-radius:4px;padding:12px 26px;font-size:.95rem;cursor:pointer;font-family:inherit}
+.btn:hover{background:var(--an-navy-2)}
+.btn.gold{background:var(--an-gold);color:var(--an-navy);font-weight:600}
+.btn.gold:hover{background:#B89448}
+.btn.ghost{background:#fff;color:var(--an-navy);border:1px solid var(--an-navy)}
+.btn.ghost:hover{background:var(--an-blue-light)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.actions{margin-top:16px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+
+/* ---- Analyse : 4 blocs ---- */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:820px){.grid2{grid-template-columns:1fr}}
+.bloc ul{list-style:none;margin-top:4px}
+.bloc li{padding:8px 0;border-bottom:1px dotted var(--border);font-size:.88rem}
+.bloc li:last-child{border-bottom:none}
+.bloc li b{color:var(--an-navy)}
+.bloc a{color:var(--an-blue)}
+.src{display:inline-block;font-size:.68rem;background:var(--an-blue-light);color:var(--an-navy-2);border-radius:3px;padding:1px 7px;margin-left:6px;vertical-align:middle;white-space:nowrap}
+.bloc.manque{border-left:4px solid var(--fr-red)}
+.bloc.leviers{border-left:4px solid var(--an-gold)}
+.tag-manque{display:inline-block;font-size:.7rem;color:#fff;background:var(--fr-red);border-radius:3px;padding:1px 8px;margin-right:6px}
+.levier-type{display:inline-block;font-size:.7rem;color:var(--an-navy);background:var(--an-gold);border-radius:3px;padding:1px 8px;margin-right:6px;font-weight:600}
+.levier-type.adapt{background:var(--an-blue);color:#fff}
+.bloc.risques{border-left:4px solid var(--warn);margin-top:18px}
+.tag-risque{display:inline-block;font-size:.7rem;color:#fff;background:var(--warn);border-radius:3px;padding:1px 8px;margin-right:6px;font-weight:600}
+.piste-leg{display:block;font-size:.8rem;color:var(--an-navy-2);margin-top:4px;font-style:italic}
+
+.notice{background:#FFF8E8;border:1px solid #E8D9AC;border-radius:5px;padding:12px 16px;font-size:.83rem;color:#6B5A22;margin:16px 0}
+.notice b{color:#4A3D12}
+
+/* ---- Proposition de loi ---- */
+.ppl{background:#fff;border:1px solid var(--border);border-radius:6px;padding:34px 40px;font-family:Georgia,serif;font-size:.95rem;min-height:200px}
+.ppl:focus{outline:2px solid var(--an-blue)}
+.ppl h4{text-align:center;font-size:1.05rem;margin-bottom:4px;color:var(--an-navy)}
+.ppl .rf{text-align:center;font-size:.78rem;letter-spacing:2px;color:var(--muted);margin-bottom:18px}
+.ppl h5{margin:20px 0 8px;font-size:.95rem;color:var(--an-navy)}
+.ppl p{margin-bottom:10px;text-align:justify}
+.ppl ul{margin:0 0 12px 24px}
+.ppl li{margin-bottom:6px;text-align:justify}
+
+/* ---- Transmission ---- */
+.transmit-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:820px){.transmit-grid{grid-template-columns:1fr}}
+label{font-size:.82rem;color:var(--an-navy);font-weight:600;display:block;margin:10px 0 4px}
+input[type=text],select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:4px;font:inherit;font-size:.9rem;background:#fff}
+input:focus,select:focus{outline:2px solid var(--an-blue)}
+.honnete{font-size:.8rem;color:var(--muted);margin-top:10px;padding-left:10px;border-left:3px solid var(--an-gold)}
+
+/* ---- Sources ---- */
+.sources{margin-top:44px}
+.src-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.pill{font-size:.75rem;border-radius:20px;padding:5px 13px;border:1px solid var(--border)}
+.pill.on{background:var(--an-navy);color:#fff;border-color:var(--an-navy)}
+.pill.off{background:#fff;color:#9AA3B2}
+.pill .dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px}
+.pill.on .dot{background:#5FD08A}
+.pill.off .dot{background:#C9CED8}
+.pill.ok{background:var(--an-navy);color:#fff;border-color:var(--ok)}
+.pill.ok .dot{background:#2ECC71;box-shadow:0 0 5px #2ECC71}
+.pill.err{background:#fff;color:var(--fr-red);border-color:var(--fr-red)}
+.pill.err .dot{background:var(--fr-red)}
+.pill.wait{background:var(--an-navy);color:#fff;border-color:var(--an-gold)}
+.pill.wait .dot{background:var(--an-gold);animation:sp 1s linear infinite}
+.branchement{border:1px solid var(--border);border-left:4px solid var(--an-gold);border-radius:6px;padding:18px 20px;margin-bottom:20px;background:var(--an-blue-light)}
+.branchement h3{font-family:Georgia,serif;color:var(--an-navy);font-size:.98rem;margin-bottom:6px}
+.br-grid{display:grid;grid-template-columns:2fr 1fr 2fr;gap:12px}
+@media(max-width:860px){.br-grid{grid-template-columns:1fr}}
+.br-grid input{font-size:.83rem}
+#apiStatus{font-size:.82rem}
+#apiStatus.ok{color:var(--ok)} #apiStatus.err{color:var(--fr-red)}
+.legende-pills{display:flex;gap:16px;flex-wrap:wrap;font-size:.72rem;color:var(--muted);margin-top:12px}
+.legende-pills .dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:4px}
+.src-note{font-size:.8rem;color:var(--muted);margin-top:12px}
+
+/* ---- Page d'accueil ---- */
+.nav-links{display:flex;gap:22px;margin-left:auto;align-items:center}
+.nav-links a{color:#C7D0E2;text-decoration:none;font-size:.86rem;padding-bottom:2px;border-bottom:2px solid transparent}
+.nav-links a:hover{color:#fff;border-bottom-color:var(--an-gold)}
+.hero{background:linear-gradient(180deg,var(--an-navy) 0%,var(--an-navy-2) 100%);color:#fff;padding:72px 24px 64px;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;right:-120px;top:-80px;width:460px;height:460px;border-radius:50%;border:60px solid rgba(201,169,97,.08)}
+.hero-inner{max-width:1060px;margin:0 auto;position:relative}
+.hero .kicker{color:var(--an-gold);font-size:.8rem;letter-spacing:3px;text-transform:uppercase;margin-bottom:16px}
+.hero h2{font-family:Georgia,serif;font-size:2.5rem;line-height:1.2;font-weight:600;max-width:760px}
+.hero h2 i{color:var(--an-gold)}
+.hero .lede{color:#C7D0E2;font-size:1.05rem;max-width:640px;margin:18px 0 30px}
+.hero .actions{margin-top:0}
+.land{padding:56px 24px}
+.land.alt{background:#fff;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.land-inner{max-width:1060px;margin:0 auto}
+.land .kicker{color:var(--an-gold);font-size:.75rem;letter-spacing:3px;text-transform:uppercase;font-weight:700;margin-bottom:8px}
+.land h2{font-family:Georgia,serif;font-size:1.7rem;color:var(--an-navy);margin-bottom:10px}
+.land .intro{color:var(--muted);max-width:780px;margin-bottom:26px;font-size:.95rem}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+@media(max-width:860px){.grid3,.grid4{grid-template-columns:1fr}.hero h2{font-size:1.8rem}}
+.tuile{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:22px;border-top:3px solid var(--an-navy)}
+.land.alt .tuile{background:var(--bg)}
+.tuile .ico{font-size:1.5rem;margin-bottom:10px}
+.tuile h3{font-family:Georgia,serif;color:var(--an-navy);font-size:1rem;margin-bottom:7px}
+.tuile p{font-size:.86rem;color:var(--muted)}
+.tuile.g1{border-top-color:var(--an-blue)}
+.tuile.g2{border-top-color:var(--an-gold)}
+.tuile.g3{border-top-color:var(--fr-red)}
+.citation{background:var(--an-navy);color:#fff;border-radius:6px;padding:26px 32px;margin-top:24px;font-family:Georgia,serif;font-style:italic;font-size:1.12rem;text-align:center}
+.citation .em{color:var(--an-gold)}
+.vague-chips{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 26px}
+.vague-chips span{background:var(--an-blue-light);color:var(--an-navy-2);border-radius:20px;padding:7px 17px;font-size:.85rem;font-weight:600}
+.methode-note{text-align:center;margin-top:22px;font-size:.92rem;color:var(--muted)}
+.methode-note b{color:var(--an-navy)}
+.credit-moa{font-size:.8rem;color:var(--muted);margin-top:22px;padding-left:10px;border-left:3px solid var(--an-gold)}
+footer{background:var(--an-navy);color:#AEBBD6;font-size:.78rem;padding:22px 24px;margin-top:60px}
+.footer-inner{max-width:1060px;margin:0 auto;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+footer a{color:#fff}
+.hidden{display:none}
+.loading{display:flex;align-items:center;gap:12px;color:var(--an-navy);font-size:.9rem;padding:30px 0;justify-content:center}
+.spin{width:22px;height:22px;border:3px solid var(--an-blue-light);border-top-color:var(--an-navy);border-radius:50%;animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div class="tricolore"><span></span><span></span><span></span></div>
+<header>
+  <div class="header-inner">
+    <svg class="hemicycle" width="54" height="54" viewBox="0 0 60 60" aria-hidden="true">
+      <path d="M30 8 A24 24 0 0 1 54 32 L46 32 A16 16 0 0 0 14 32 L6 32 A24 24 0 0 1 30 8 Z" fill="#C9A961"/>
+      <rect x="6" y="36" width="48" height="4" fill="#fff"/>
+      <rect x="12" y="44" width="36" height="4" fill="#fff" opacity=".7"/>
+      <rect x="18" y="52" width="24" height="4" fill="#fff" opacity=".4"/>
+    </svg>
+    <div>
+      <h1>Éclaireur <span class="serif">— votre projet face à la loi</span></h1>
+      <div class="sub">Radar législatif citoyen — assistant de pré-analyse sur les données ouvertes du Parlement et de Légifrance</div>
+    </div>
+    <nav class="nav-links">
+      <a href="#constat">Le constat</a>
+      <a href="#definition">Les 3 questions</a>
+      <a href="#methode">La méthode</a>
+      <a href="#outil">L'outil ⚖</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ================= ACCUEIL ================= -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="kicker">Données ouvertes · Assemblée nationale · Légifrance · XVIIe législature</div>
+    <h2>L'innovation va plus vite que la loi. <i>Anticipons — pour que les bonnes idées arrivent plus vite.</i></h2>
+    <p class="lede">Des projets portés par de nouvelles technologies émergent chaque jour. Certains percutent un droit qui ne les avait pas prévus ; d'autres créent des risques que personne n'a anticipés. Cet outil confronte votre projet aux données publiques du Parlement et de Légifrance : ce que la loi permet, ce qui bloque, comment vous adapter — et comment faire avancer le débat législatif.</p>
+    <div class="actions">
+      <a href="#outil" class="btn gold" style="text-decoration:none">⚖ Analyser mon projet</a>
+      <a href="#constat" class="btn ghost" style="text-decoration:none;background:transparent;color:#fff;border-color:#5C6E96">Comprendre la démarche ↓</a>
+    </div>
+  </div>
+</section>
+
+<section class="land" id="constat">
+  <div class="land-inner">
+    <div class="kicker">01 — Le constat</div>
+    <h2>Deux façons de percuter la loi</h2>
+    <p class="intro">Quand une technologie nouvelle rencontre le droit existant, deux scénarios se répètent — et tous deux se paient en retard, en blocages ou en crises.</p>
+    <div class="grid3">
+      <div class="tuile g1"><div class="ico">🧩</div><h3>Le projet utile, freiné</h3><p>Exemple : MOA, IA conversationnelle de prévention du post-partum. Classée « à haut risque », sans case claire dans le droit — alors qu'elle répond à un enjeu majeur de santé publique. Faute de cadre adapté, sa mise sur le marché se complique.</p></div>
+      <div class="tuile g3"><div class="ico">⚡</div><h3>Le risque non anticipé</h3><p>Exemple : les dérives d'IA génératives déployées à grande échelle, comme les controverses autour de Grok. Des problèmes juridiques prévisibles dès l'arrivée de ces technologies — mais que personne n'avait instruits à temps.</p></div>
+      <div class="tuile g2"><div class="ico">🧭</div><h3>Le citoyen, capteur d'anticipation</h3><p>Ceux qui portent des projets voient les frictions avant tout le monde. Remonter ces signaux aux législateurs, c'est instruire le débat avant la crise — pas après.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="land alt" id="definition">
+  <div class="land-inner">
+    <div class="kicker">02 — De quoi parle-t-on</div>
+    <h2>Trois questions que tout porteur de projet devrait pouvoir se poser</h2>
+    <div class="grid3">
+      <div class="tuile g1"><div class="ico">📖</div><h3>Qu'est-ce que la loi permet déjà ?</h3><p>Les textes en vigueur, les cadres existants, les dispositifs sur lesquels s'appuyer dès aujourd'hui.</p></div>
+      <div class="tuile g3"><div class="ico">🚧</div><h3>Où mon projet percute-t-il le droit ?</h3><p>Les catégories qui ne collent pas, les obligations ambiguës, les risques juridiques à l'usage.</p></div>
+      <div class="tuile g2"><div class="ico">🧭</div><h3>Comment m'adapter — et faire évoluer ?</h3><p>Ce que je peux faire maintenant (expérimentation, conformité), et ce qu'il faut proposer au législateur.</p></div>
+    </div>
+    <div class="citation">Ce n'est pas chercher le trou dans la loi — <span class="em">c'est aider un projet à émerger, et le débat législatif à prendre de l'avance.</span></div>
+  </div>
+</section>
+
+<section class="land" id="methode">
+  <div class="land-inner">
+    <div class="kicker">03 — La méthode</div>
+    <h2>Une IA de confiance qui confronte votre projet au droit</h2>
+    <p class="intro">À partir de votre projet, l'outil lit les données publiques et produit une fiche sourcée — complétée d'un volet « risques portés par le projet et garde-fous possibles », car un projet responsable arrive avec ses risques documentés :</p>
+    <div class="grid4">
+      <div class="tuile g1"><div class="ico">⚖</div><h3>Ce que le droit prévoit</h3><p>Les textes et cadres sur lesquels votre projet peut s'appuyer.</p></div>
+      <div class="tuile g1"><div class="ico">🗣</div><h3>Signaux au Parlement</h3><p>Débats, rapports et questions qui touchent déjà votre sujet.</p></div>
+      <div class="tuile g3"><div class="ico">🚧</div><h3>Points de friction</h3><p>Là où votre projet percute la loi — ou révèle un risque à anticiper.</p></div>
+      <div class="tuile g2"><div class="ico">🧭</div><h3>S'adapter &amp; proposer</h3><p>Agir dans le cadre actuel, et faire évoluer la loi en amont.</p></div>
+    </div>
+    <p class="methode-note"><b>Chaque ligne renvoie à sa source officielle — une chaîne de preuve vérifiable.</b> L'outil ne produit pas de conclusion juridique définitive et ne se substitue ni au juriste ni à l'administrateur : il accélère le repérage. L'IA éclaire, l'humain décide.</p>
+  </div>
+</section>
+
+<section class="land alt" id="vague">
+  <div class="land-inner">
+    <div class="kicker">04 — Ce n'est pas un cas isolé</div>
+    <h2>Une vague de projets IA arrive — accélérons le sujet</h2>
+    <p class="intro">Dans les années qui viennent, des dizaines de projets portés par l'IA vont sortir « de nulle part », dans des domaines sensibles. Tous poseront les mêmes questions : ambiguïté réglementaire, responsabilité, données sensibles, confiance à établir. Pour que la société ne se retrouve pas en défaut face à eux — et eux face à elle — les frictions doivent remonter aux législateurs avant les problèmes.</p>
+    <div class="vague-chips">
+      <span>Santé mentale</span><span>Grand âge</span><span>Aidants</span><span>Handicap</span><span>Éducation</span><span>Précarité</span><span>Périnatalité</span><span>Ruralité</span><span>Logement</span><span>IA générative</span>
+    </div>
+    <div class="citation" style="margin-top:0">Chaque projet citoyen confronté à la loi <span class="em">est un signal d'anticipation pour le législateur.</span></div>
+    <p class="credit-moa">Démarche inspirée de <b>MOA</b> (avec-moa.com) — prévention du post-partum par une IA conversationnelle supervisée, classée « à haut risque » — cas d'école présenté au Hackathon Assemblée nationale 2026 : un projet réel pour démontrer la méthode.</p>
+  </div>
+</section>
+
+<div class="steps" id="outil">
+  <div class="steps-inner">
+    <div class="step active" id="st1"><span class="num">1</span> Votre projet</div>
+    <div class="step" id="st2"><span class="num">2</span> Votre projet face à la loi</div>
+    <div class="step" id="st3"><span class="num">3</span> Dossier pour le député</div>
+    <div class="step" id="st4"><span class="num">4</span> Transmettre à un député</div>
+  </div>
+</div>
+
+<main>
+
+  <!-- ================= ÉTAPE 1 : PROJET ================= -->
+  <h2 class="section">Présentez votre projet</h2>
+  <p class="section-sub">Chargez une présentation ou décrivez votre projet en quelques phrases. L'outil le confronte au droit existant et aux travaux parlementaires : sur quoi vous appuyer, où ça frotte, comment vous adapter — et quoi proposer au législateur pour prendre de l'avance.</p>
+
+  <div class="card">
+    <div class="entry">
+      <div>
+        <textarea id="pitch" placeholder="Exemple : « Nous voulons créer un réseau de tiers-lieux de santé en zone rurale, portés par les communes, où des infirmiers en pratique avancée assurent des consultations de premier recours sans présence médicale sur place… »"></textarea>
+        <div class="exemples">
+          <span>Essayer :</span>
+          <button class="chip" data-ex="sante">Santé rurale</button>
+          <button class="chip" data-ex="ia">IA à l'école</button>
+          <button class="chip" data-ex="logement">Habitat léger</button>
+          <button class="chip" data-ex="agri">Cantines locales</button>
+        </div>
+      </div>
+      <div class="dropzone" id="dz">
+        <div class="ico">📄</div>
+        <p><b>Déposez votre présentation</b><br>ou cliquez pour choisir un fichier</p>
+        <small>.pptx · .pdf · .docx · .txt · .md — texte extrait directement dans votre navigateur</small>
+        <span class="file-chip" id="fileChip"></span>
+        <input type="file" id="fileInput" accept=".txt,.md,.pdf,.pptx,.docx" hidden>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn gold" id="btnAnalyse">⚖ Analyser mon projet</button>
+      <span style="font-size:.8rem;color:var(--muted)">L'analyse croise Légifrance, les débats, rapports et questions parlementaires.</span>
+    </div>
+  </div>
+
+  <!-- ================= ÉTAPE 2 : ANALYSE ================= -->
+  <div id="zoneAnalyse" class="hidden">
+    <h2 class="section">Votre projet face à la loi</h2>
+    <p class="section-sub" id="resumeProjet"></p>
+
+    <div class="loading hidden" id="loader"><div class="spin"></div> Interrogation des sources parlementaires et législatives…</div>
+
+    <div id="blocs" class="hidden">
+      <div class="grid2">
+        <div class="card bloc" id="blocTextes">
+          <h3><span class="pastille">📜</span> Ce que le droit prévoit déjà</h3>
+          <ul id="ulTextes"></ul>
+        </div>
+        <div class="card bloc" id="blocDebats">
+          <h3><span class="pastille">🗣</span> Signaux au Parlement — débats, rapports &amp; questions</h3>
+          <ul id="ulDebats"></ul>
+        </div>
+      </div>
+      <div class="grid2" style="margin-top:18px">
+        <div class="card bloc manque">
+          <h3><span class="pastille">🚧</span> Points de friction &amp; zones grises — là où votre projet percute la loi</h3>
+          <ul id="ulManque"></ul>
+        </div>
+        <div class="card bloc leviers">
+          <h3><span class="pastille">🧭</span> Agir — s'adapter aujourd'hui, faire évoluer demain</h3>
+          <ul id="ulLeviers"></ul>
+        </div>
+      </div>
+      <div class="card bloc risques">
+        <h3><span class="pastille">⚠</span> Risques portés par le projet — et garde-fous que la loi pourrait poser</h3>
+        <p style="font-size:.85rem;color:var(--muted);margin-bottom:8px">Un projet responsable se présente avec ses risques. Les documenter permet au législateur de poser des garde-fous ciblés, dans le sens du bien-être collectif — plutôt que des interdictions générales.</p>
+        <ul id="ulRisques"></ul>
+      </div>
+      <div class="notice" id="noticeTransparence"></div>
+      <div class="actions">
+        <button class="btn" id="btnPPL">✒ Préparer le dossier pour le député</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= ÉTAPE 3 : PPL ================= -->
+  <div id="zonePPL" class="hidden">
+    <h2 class="section">Dossier de présentation au député</h2>
+    <p class="section-sub">Pas une proposition de loi toute faite — c'est le travail du législateur. Une note structurée qui présente votre projet, ce que la loi permet déjà, où ça bloque, ce que vous faites, les risques que vous assumez de documenter — avec garde-fous proposés — et ce que vous attendez de votre député. Le texte est éditable directement — cliquez dedans pour le modifier.</p>
+    <div class="ppl" id="pplDoc" contenteditable="true"></div>
+    <div class="actions">
+      <button class="btn ghost" id="btnCopy">⧉ Copier le texte</button>
+      <button class="btn ghost" id="btnDl">⬇ Télécharger (.txt)</button>
+      <button class="btn" id="btnTransmit">📨 Transmettre à un député</button>
+    </div>
+  </div>
+
+  <!-- ================= ÉTAPE 4 : TRANSMISSION ================= -->
+  <div id="zoneTransmit" class="hidden">
+    <h2 class="section">Transmettre au bon interlocuteur</h2>
+    <p class="section-sub">L'outil prépare l'email avec votre proposition. <b>Rien n'est envoyé automatiquement</b> : vous relisez et envoyez depuis votre messagerie.</p>
+    <div class="transmit-grid">
+      <div class="card">
+        <h3><span class="pastille">🗳</span> Votre député</h3>
+        <label for="depNom">Nom du député (si vous le connaissez)</label>
+        <input type="text" id="depNom" placeholder="Ex. : Jeanne Martin">
+        <label for="depEmail">Son adresse (prenom.nom@assemblee-nationale.fr)</label>
+        <input type="text" id="depEmail" placeholder="prenom.nom@assemblee-nationale.fr">
+        <p style="font-size:.8rem;margin-top:10px"><a href="https://www.assemblee-nationale.fr/dyn/vos-deputes" target="_blank" rel="noopener">→ Trouver mon député par circonscription (assemblee-nationale.fr)</a></p>
+      </div>
+      <div class="card">
+        <h3><span class="pastille">🏛</span> Ou cibler la commission compétente</h3>
+        <label for="selCom">Commission permanente</label>
+        <select id="selCom">
+          <option value="">— Sélectionner —</option>
+          <option>Commission des affaires sociales</option>
+          <option>Commission des affaires économiques</option>
+          <option>Commission des affaires culturelles et de l'éducation</option>
+          <option>Commission du développement durable et de l'aménagement du territoire</option>
+          <option>Commission des lois</option>
+          <option>Commission des finances</option>
+          <option>Commission de la défense</option>
+          <option>Commission des affaires étrangères</option>
+        </select>
+        <p style="font-size:.8rem;margin-top:10px"><a href="https://www.assemblee-nationale.fr/dyn/commissions-et-autres-organes" target="_blank" rel="noopener">→ Les commissions et leurs membres</a></p>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn gold" id="btnMail">✉ Préparer l'email (relecture avant envoi)</button>
+    </div>
+    <p class="honnete">Principe de conception : l'envoi automatisé n'existe pas dans cet outil. Toute transmission passe par votre relecture et votre geste d'envoi. Un envoi assisté se câblera plus tard, avec confirmation explicite à chaque fois.</p>
+  </div>
+
+  <!-- ================= SOURCES ================= -->
+  <div class="sources">
+    <h2 class="section">Sources de données branchées</h2>
+    <p class="section-sub">Jeux de données ouverts mobilisés par l'analyse (verts : actifs · gris : disponibles, non branchés).</p>
+    <div class="card">
+      <div class="branchement">
+        <h3>⚙ Branchement de l'API unifiée an-et-co (Canutes / Légifrance)</h3>
+        <div class="br-grid">
+          <div><label for="apiBase">URL de base de l'API</label><input type="text" id="apiBase" placeholder="https://…tricoteuses.fr/…"></div>
+          <div><label for="apiToken">Jeton (optionnel)</label><input type="text" id="apiToken" placeholder="clé fournie au hackathon"></div>
+          <div><label for="apiTpl">Gabarit de recherche (ajuster selon la doc)</label><input type="text" id="apiTpl" value="/search?q={q}&source={source}"></div>
+        </div>
+        <div class="actions" style="margin-top:12px">
+          <button class="btn ghost" id="btnConnect">🔌 Connecter &amp; tester</button>
+          <span id="apiStatus"></span>
+        </div>
+        <p class="src-note">La documentation de l'API est sur <a href="https://www.tricoteuses.fr/services/api-canutes-legifrance/documentation" target="_blank" rel="noopener">tricoteuses.fr</a> (protégée par un anti-robot : ouvrez-la dans votre navigateur). Collez l'URL de base ci-dessus et ajustez le gabarit — <code>{q}</code> = mots-clés, <code>{source}</code> = identifiant du jeu de données. Configuration mémorisée dans votre navigateur uniquement.</p>
+      </div>
+      <div class="src-pills" id="pills"></div>
+      <div class="legende-pills">
+        <span><span class="dot" style="background:#5FD08A"></span>coché (mode démo)</span>
+        <span><span class="dot" style="background:#2ECC71"></span>connecté, répond</span>
+        <span><span class="dot" style="background:var(--an-gold)"></span>interrogation en cours</span>
+        <span><span class="dot" style="background:var(--fr-red)"></span>erreur (CORS / URL / jeton)</span>
+        <span><span class="dot" style="background:#C9CED8"></span>disponible, non branché</span>
+      </div>
+      <p class="src-note">
+        Accès unifié : <a href="https://data.assemblee-nationale.fr" target="_blank" rel="noopener">data.assemblee-nationale.fr</a> ·
+        <a href="https://www.legifrance.gouv.fr" target="_blank" rel="noopener">Légifrance</a> ·
+        <a href="https://www.journal-officiel.gouv.fr" target="_blank" rel="noopener">Journal officiel</a> ·
+        serveur MCP &amp; API « an-et-co » (Parlement / Législation / Service public) ·
+        base SQL « moulinette » <a href="https://tricoteuses.fr" target="_blank" rel="noopener">tricoteuses.fr</a>
+      </p>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div>Angles morts — outil citoyen construit sur les données ouvertes du Parlement. Non affilié à l'Assemblée nationale.</div>
+    <div><a href="https://data.assemblee-nationale.fr" target="_blank" rel="noopener">Open Data AN</a> · <a href="https://www.legifrance.gouv.fr" target="_blank" rel="noopener">Légifrance</a></div>
+  </div>
+</footer>
+
+<script>
+"use strict";
+/* ============================================================
+   COUCHE DE CONNEXION — API unifiée « an-et-co » (Canutes)
+   Ressource hackathon AN 2026 :
+   - an-et-co-api-…    → tricoteuses.fr/services/api-canutes-legifrance
+   - an-et-co-mcp-…    → tricoteuses.fr/services/mcp-moulineuse
+   - an-et-co-database → tricoteuses.fr/services/database-canutes (PostgreSQL)
+   Collez l'URL de base de l'API dans le panneau « Branchement »
+   (elle figure dans la documentation, accessible dans un vrai
+   navigateur — le site est protégé par un anti-robot).
+   ============================================================ */
+const API_CONF_KEY = "anglesmorts.api.v1";
+function getConf(){ try{ return JSON.parse(localStorage.getItem(API_CONF_KEY)) || {}; }catch(e){ return {}; } }
+function setConf(c){ try{ localStorage.setItem(API_CONF_KEY, JSON.stringify(c)); }catch(e){} }
+
+const DATASETS = [
+  /* [id, libellé, coché, groupe] — cochés = mobilisés par l'analyse via l'API unifiée */
+  ["an-dossiers-legislatifs","Dossiers législatifs AN",true,"debats"],
+  ["an-amendements-xvii","Amendements AN",true,"debats"],
+  ["an-comptes-rendus","Comptes rendus séance publique AN",true,"debats"],
+  ["an-questions-gouvernement","Questions au Gouvernement",true,"debats"],
+  ["an-questions-gouvernement-ecrites","Questions écrites",true,"debats"],
+  ["an-questions-gouvernement-orales","Questions orales",true,"debats"],
+  ["premier-ministre-legi","Codes, lois et règlements (LEGI)",true,"textes"],
+  ["premier-ministre-dole","Dossiers législatifs Légifrance (DOLE)",true,"textes"],
+  ["premier-ministre-jorf","Journal officiel (JORF)",true,"textes"],
+  ["an-et-co-database-regroupement-toutes-donnees","Base unifiée Parlement/Législation/Service public",true,"infra"],
+  ["an-et-co-serveur-mcp-regroupement-toutes-donnees","Serveur MCP unifié (moulineuse)",true,"infra"],
+  ["an-et-co-api-regroupement-toutes-donnees","API unifiée (Canutes)",true,"infra"],
+  ["openfisca-france-parameters","Paramètres OpenFisca",false,""],
+  ["an-votes-xvii","Votes des députés",false,""],
+  ["an-deputes-en-exercice","Députés en exercice",false,""],
+  ["an-deputes-historique","Historique des députés",false,""],
+  ["an-deputes-senateurs-ministres-par-legislature","Députés, sénateurs, ministres par législature",false,""],
+  ["an-agenda-reunions","Agenda des réunions AN",false,""],
+  ["senat-dispositifs-textes","Dispositifs des textes Sénat",false,""],
+  ["senat-dossiers-legislatifs","Dossiers législatifs Sénat",false,""],
+  ["senat-amendements","Amendements Sénat",false,""],
+  ["senat-senateurs","Sénateurs",false,""],
+  ["senat-questions-gouvernement","Questions Sénat",false,""],
+  ["senat-comptes-rendus","Comptes rendus Sénat",false,""],
+  ["legiwatch-api-parlement","LegiWatch — API Parlement",false,""],
+  ["legiwatch-database-parlement","LegiWatch — Base Parlement",false,""],
+  ["legiwatch-serveur-mcp-parlement","LegiWatch — Serveur MCP",false,""]
+];
+const SOURCES_TEXTES = DATASETS.filter(d=>d[3]==="textes").map(d=>d[0]);
+const SOURCES_DEBATS = DATASETS.filter(d=>d[3]==="debats").map(d=>d[0]);
+
+/* ---- Requête générique vers l'API unifiée ---- */
+async function requeteSource(conf, source, q){
+  const chemin = (conf.template||"/search?q={q}&source={source}")
+    .replace("{q}",encodeURIComponent(q))
+    .replace("{source}",encodeURIComponent(source));
+  const ctrl = new AbortController(); setTimeout(()=>ctrl.abort(), 12000);
+  const r = await fetch(conf.base.replace(/\/+$/,"") + chemin, {
+    signal: ctrl.signal,
+    headers: Object.assign({Accept:"application/json"}, conf.token?{Authorization:"Bearer "+conf.token}:{})
+  });
+  if(!r.ok) throw new Error("HTTP "+r.status);
+  return await r.json();
+}
+
+/* Normalise les réponses aux formes JSON les plus courantes */
+function normaliser(json){
+  const arr = Array.isArray(json) ? json : (json.results||json.items||json.hits||json.data||json.documents||json.records||[]);
+  return (Array.isArray(arr)?arr:[]).slice(0,4).map(o=>({
+    titre: String(o.titre||o.title||o.libelle||o.nom||o.name||o.intitule||"Document").slice(0,140),
+    detail: String(o.extrait||o.resume||o.description||o.summary||o.objet||o.texte||o.snippet||"").replace(/<[^>]+>/g,"").slice(0,200),
+    lien: String(o.url||o.lien||o.link||o.href||o.uri||"")
+  })).filter(x=>x.titre!=="Document"||x.detail||x.lien);
+}
+
+/* ---- Statuts visuels des sources ---- */
+function setPill(id,etat){ /* on|off|ok|err|wait */
+  const p=document.querySelector(`.pill[data-id="${id}"]`);
+  if(p){ p.classList.remove("on","off","ok","err","wait"); p.classList.add(etat); }
+}
+function setPillsGroupe(ids,etat){ ids.forEach(i=>setPill(i,etat)); }
+
+/* ---- Domaines : codes, commission, angles morts types ---- */
+const DOMAINES = {
+  sante:{
+    mots:["santé","soin","médecin","médical","infirmier","hôpital","désert médical","patient","télémédecine","pharmacie","prévention"],
+    codes:[["Code de la santé publique","exercice des professions de santé, structures de soins, coopérations (art. L.4011-1 s. : protocoles de coopération)"],["Code de la sécurité sociale","financement, remboursement, expérimentations « article 51 » (LFSS 2018)"],["Code général des collectivités territoriales","compétences des communes en matière sanitaire"]],
+    commission:"Commission des affaires sociales",
+    risques:[
+      ["Dérive d'emprise","Une IA conversationnelle en santé mentale peut glisser vers une relation d'emprise ou une dérive sectaire : discours prescripteur de croyances, isolement de l'usager de son entourage et des professionnels de soin.","Obligation de supervision par un professionnel de santé identifié, et canal de signalement des dérives (articulation avec la MIVILUDES)."],
+      ["Dérive sémantique","Glissement progressif du discours du modèle hors du cadre thérapeutique validé, imperceptible à l'échelle d'une conversation mais réel sur la durée.","Audits sémantiques périodiques obligatoires, sur référentiel de discours validé par les autorités sanitaires."],
+      ["Vulnérabilité technique","Altération du comportement du modèle par simple interaction (injection de prompt, contournement des consignes) — par un usager fragile ou un tiers malveillant.","Tests d'intrusion (red teaming) obligatoires avant mise sur le marché et après chaque mise à jour majeure du modèle."],
+      ["Données d'entraînement","Réutilisation des conversations — données de santé sensibles — pour entraîner le modèle : consentement, minimisation, hébergement certifié.","Encadrer explicitement la réutilisation des données conversationnelles de santé à des fins d'entraînement."]
+    ],
+    adapt:["Monter le projet en expérimentation « article 51 » LFSS pour un financement dérogatoire immédiat","S'adosser à un protocole de coopération existant (art. L.4011-1 CSP)","Si qualification « dispositif médical » : anticiper marquage CE et classification dès la conception"],
+    manques:["Aucun statut juridique dédié pour la structure que vous décrivez : elle tombe entre les catégories existantes (centre de santé, maison de santé, ESP).","Les délégations d'actes que suppose votre projet dépassent les protocoles de coopération actuels — un élargissement législatif est nécessaire.","Le financement pérenne n'est prévu par aucun texte : seule la voie expérimentale (art. 51 LFSS) est ouverte, par dérogation et à durée limitée."],
+    leviers:[["PPL","Proposition de loi créant le statut adapté et élargissant les délégations"],["Amendement","Amendement au prochain PLFSS pour le financement pérenne"],["Question écrite","Question écrite au ministre de la Santé pour objectiver le vide juridique"],["Mission","Saisine de la mission d'évaluation des comptes de la sécurité sociale (MECSS)"]]
+  },
+  ia:{
+    mots:["ia","intelligence artificielle","algorithme","école","éducation","élève","enseignant","numérique éducatif","edtech","apprentissage"],
+    codes:[["Code de l'éducation","liberté pédagogique (art. L.912-1-1), service public du numérique éducatif (art. L.131-2)"],["RGPD / loi Informatique et libertés","traitement des données des mineurs, base légale, DPO académiques"],["Règlement européen sur l'IA (AI Act)","systèmes d'IA en éducation classés « haut risque » (annexe III)"]],
+    commission:"Commission des affaires culturelles et de l'éducation",
+    risques:[
+      ["Dérive sémantique","Glissement du contenu pédagogique hors des programmes ou vers des biais non détectés à l'échelle d'un exercice isolé.","Audits périodiques des sorties du modèle sur référentiel validé par l'Éducation nationale."],
+      ["Vulnérabilité technique","Altération du comportement par les élèves eux-mêmes (injection de prompt, contournement) — public expert en la matière.","Red teaming obligatoire incluant des scénarios d'usage par mineurs, avant tout déploiement en classe."],
+      ["Données d'entraînement","Réutilisation des productions et données d'élèves mineurs pour entraîner le modèle.","Interdiction ou encadrement strict de l'entraînement sur données de mineurs sans consentement explicite."]
+    ],
+    adapt:["Réaliser l'analyse d'impact (AIPD, RGPD) et documenter dès maintenant les exigences AI Act « haut risque » : registre, supervision humaine, transparence","Contractualiser avec l'académie via une convention d'expérimentation","Faire évaluer l'outil par un tiers indépendant avant déploiement pour bâtir la confiance"],
+    manques:["Aucun cadre légal national ne définit les conditions d'usage d'une IA en classe : le vide est comblé par des circulaires, juridiquement fragiles.","La qualification « haut risque » de l'AI Act impose des obligations que le code de l'éducation ne décline pas (transparence, supervision humaine, registre).","Rien n'organise l'évaluation indépendante des outils avant déploiement, ni les droits des familles (information, opposition)."],
+    leviers:[["PPL","Proposition de loi encadrant l'IA dans le service public de l'éducation"],["Amendement","Amendements au prochain texte numérique ou éducation"],["Question écrite","Question au ministre de l'Éducation nationale sur la déclinaison de l'AI Act"],["Rapport","Demande de rapport OPECST sur l'IA éducative"]]
+  },
+  logement:{
+    mots:["logement","habitat","léger","yourte","tiny","construction","urbanisme","permis","terrain","résidence","habiter"],
+    codes:[["Code de l'urbanisme","« pastilles » STECAL (art. L.151-13), résidences démontables (loi ALUR, art. R.111-51)"],["Code de la construction et de l'habitation","normes de décence, définition du logement"],["Code général des impôts","fiscalité des résidences mobiles et démontables"]],
+    commission:"Commission du développement durable et de l'aménagement du territoire",
+    adapt:["Cibler d'abord les communes disposant déjà de STECAL dans leur PLU","Sécuriser l'installation par convention d'occupation du terrain communal","Utiliser la déclaration préalable pour les installations de petite surface"],
+    manques:["Les STECAL restent « exceptionnels » par la loi : les communes volontaires ne peuvent pas en faire un outil ordinaire d'accueil de l'habitat léger.","La définition du logement décent est pensée pour le bâti classique : l'habitat réversible que vous décrivez reste dans une zone grise (CAF, assurance, domiciliation).","Aucune procédure simplifiée n'existe entre la déclaration préalable et le permis, inadaptés aux installations réversibles."],
+    leviers:[["PPL","Proposition de loi sur l'habitat réversible et son statut d'occupation"],["Amendement","Amendements à un texte logement/urbanisme en navette"],["Question écrite","Question au ministre du Logement sur l'application des textes ALUR"],["Pétition","Pétition AN (plateforme officielle) pour ouvrir le débat en commission"]]
+  },
+  agri:{
+    mots:["cantine","alimentation","agricole","agriculteur","local","circuit court","bio","restauration collective","ferme","paysan"],
+    codes:[["Code rural et de la pêche maritime","objectifs EGalim (art. L.230-5-1 : 50 % durables dont 20 % bio en restauration collective)"],["Code de la commande publique","critères d'attribution — le « localisme » explicite reste prohibé (droit UE)"],["Code général des collectivités territoriales","compétence restauration scolaire des communes"]],
+    commission:"Commission des affaires économiques",
+    adapt:["Utiliser les critères licites du code de la commande publique : fraîcheur, saisonnalité, circuits courts, performance environnementale","Monter un groupement de commandes avec les communes voisines","S'appuyer sur un projet alimentaire territorial (PAT) existant"],
+    manques:["Le droit de la commande publique interdit le critère de proximité géographique explicite : les communes contournent par des critères indirects, fragiles juridiquement.","Les objectifs EGalim sont sans mécanisme contraignant ni accompagnement financier pérenne pour les petites communes.","Aucun outil législatif ne sécurise les régies agricoles municipales approvisionnant les cantines."],
+    leviers:[["PPL","Proposition de loi sécurisant l'approvisionnement local (dans les limites du droit UE)"],["Amendement","Amendements au prochain texte agricole ou PLF (dotation cantines)"],["Question écrite","Question au ministre de l'Agriculture sur le bilan EGalim"],["Rapport","Demande de rapport sur l'application de la loi EGalim (baromètre AN)"]]
+  }
+};
+
+const EXEMPLES = {
+  sante:"Nous voulons créer un réseau de tiers-lieux de santé en zone rurale, portés par les communes, où des infirmiers en pratique avancée assurent des consultations de premier recours sans présence médicale permanente, avec télé-expertise vers l'hôpital de secteur.",
+  ia:"Notre association déploie un assistant d'IA pour aider les enseignants de collège à différencier les exercices selon le niveau des élèves. Nous voulons un cadre clair : données des élèves, validation pédagogique, droits des familles.",
+  logement:"Nous accompagnons des communes rurales qui veulent accueillir de l'habitat léger réversible (tiny houses, yourtes) pour de jeunes actifs, sur des terrains communaux, sans artificialiser les sols.",
+  agri:"Notre collectif veut permettre aux communes de servir 80 % de produits locaux dans les cantines scolaires, en s'appuyant sur une régie agricole municipale et des contrats directs avec les fermes du territoire."
+};
+
+/* ---------- Utilitaires ---------- */
+const $ = id => document.getElementById(id);
+const lg = q => `https://www.legifrance.gouv.fr/search/all?query=${encodeURIComponent(q)}&tab_selection=all`;
+let projetTexte = "", analyse = null;
+
+function motsCles(txt){
+  const stop = new Set("le la les un une des du de d l et ou à a au aux en dans pour par sur avec sans que qui nous vous ils elle il ce cette ces son sa ses leur leurs notre nos votre vos est sont ont être avoir veut voulons faire plus notre comme afin dont où mais aussi tout tous toute toutes".split(" "));
+  const freq = {};
+  (txt.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").match(/[a-z]{4,}/g)||[]).forEach(m=>{ if(!stop.has(m)) freq[m]=(freq[m]||0)+1; });
+  return Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,5).map(e=>e[0]);
+}
+
+function detecterDomaine(txt){
+  const t = txt.toLowerCase();
+  let best = null, bestScore = 0;
+  for(const [k,d] of Object.entries(DOMAINES)){
+    const score = d.mots.reduce((s,m)=>s+(t.includes(m)?1:0),0);
+    if(score>bestScore){bestScore=score;best=k;}
+  }
+  return bestScore>=1 ? best : null;
+}
+
+/* ---------- Analyse : sources réelles si API branchée, démo sinon ---------- */
+async function analyser(txt){
+  const conf = getConf();
+  const base = analyserLocal(txt);
+  if(!conf.base) return base;
+
+  /* Interroge en parallèle les 9 sources documentaires cochées via l'API unifiée */
+  const kq = base.kws.slice(0,3).join(" ");
+  const cibles = [...SOURCES_TEXTES, ...SOURCES_DEBATS];
+  setPillsGroupe(cibles,"wait");
+  const reponses = await Promise.allSettled(cibles.map(s=>requeteSource(conf,s,kq)));
+  const libelle = id => (DATASETS.find(d=>d[0]===id)||[,id])[1];
+  const reels = {textes:[],debats:[]};
+  let okCount = 0;
+  reponses.forEach((r,i)=>{
+    const id = cibles[i];
+    if(r.status==="fulfilled"){
+      const items = normaliser(r.value);
+      setPill(id, items.length ? "ok" : "on");
+      okCount++;
+      const groupe = SOURCES_TEXTES.includes(id) ? "textes" : "debats";
+      items.forEach(it=>reels[groupe].push({titre:it.titre, detail:it.detail||libelle(id), lien:it.lien||"", src:id}));
+    } else {
+      console.warn(id, r.reason);
+      setPill(id,"err");
+    }
+  });
+  setPillsGroupe(["an-et-co-api-regroupement-toutes-donnees","an-et-co-database-regroupement-toutes-donnees","an-et-co-serveur-mcp-regroupement-toutes-donnees"], okCount?"ok":"err");
+
+  if(!okCount) { base.mode="erreur-api"; return base; } /* API injoignable : repli démo */
+  base.mode="connecte";
+  if(reels.textes.length) base.textes = reels.textes.slice(0,5);
+  if(reels.debats.length) base.debats = reels.debats.slice(0,6);
+  return base;
+}
+
+/* Risques : ceux du domaine, sinon génériques ; volet technique ajouté si le projet mobilise de l'IA */
+function construireRisques(txt, d){
+  if(d && d.risques) return d.risques;
+  const r = [
+    ["Usage détourné","Utilisation du dispositif par des acteurs ou à des fins non prévues par le projet (public extérieur, détournement de finalité).","Définir légalement les usages autorisés, les publics visés et les obligations de contrôle de l'exploitant."],
+    ["Responsabilité","En cas de dommage, la chaîne de responsabilité — porteur, fournisseur technique, utilisateur — n'est pas clairement établie.","Clarifier le régime de responsabilité applicable à ce type de dispositif."]
+  ];
+  if(/\b(ia|intelligence artificielle|algorithme|chatbot|assistant|modèle|llm|conversationnel)/i.test(txt)){
+    r.push(
+      ["Vulnérabilité technique","Altération du comportement du modèle par simple interaction (injection de prompt, contournement des consignes).","Tests d'intrusion (red teaming) obligatoires avant déploiement et après chaque mise à jour majeure."],
+      ["Dérive sémantique","Glissement progressif des réponses du modèle hors du cadre prévu, indétectable conversation par conversation.","Audits sémantiques périodiques sur référentiel validé par l'autorité compétente."],
+      ["Données d'entraînement","Réutilisation des données des usagers pour entraîner ou ajuster le modèle.","Encadrer le consentement, la minimisation et la finalité de tout entraînement sur données d'usage."]
+    );
+  }
+  return r;
+}
+
+function analyserLocal(txt){
+  const dom = detecterDomaine(txt);
+  const kws = motsCles(txt);
+  const kq = kws.slice(0,3).join(" ");
+  const d = dom ? DOMAINES[dom] : null;
+  return {
+    mode: "demo",
+    domaine: dom,
+    kws,
+    textes: (d? d.codes : [["Recherche transversale","aucun domaine dominant détecté — recherche par mots-clés dans les codes consolidés"]]).map(c=>({titre:c[0],detail:c[1],lien:lg(c[0]+" "+kq),src:"premier-ministre-legi"})),
+    debats:[
+      {titre:"Dossiers législatifs liés",detail:`Textes en cours ou récents touchant « ${kq} »`,lien:"https://www.assemblee-nationale.fr/dyn/17/dossiers",src:"an-dossiers-legislatifs"},
+      {titre:"Questions au Gouvernement",detail:"Questions écrites et orales de députés sur ce sujet — signal politique existant",lien:"https://www.assemblee-nationale.fr/dyn/17/questions",src:"an-questions-gouvernement"},
+      {titre:"Comptes rendus des débats",detail:"Séances publiques où le sujet a été évoqué",lien:"https://www.assemblee-nationale.fr/dyn/17/comptes-rendus/seance",src:"an-comptes-rendus"},
+      {titre:"Amendements déposés",detail:"Tentatives antérieures de faire évoluer le droit sur ce point",lien:"https://www.assemblee-nationale.fr/dyn/17/amendements",src:"an-amendements-xvii"},
+      {titre:"Dossiers Légifrance (DOLE)",detail:"Historique complet des textes, exposés des motifs et études d'impact",lien:lg(kq),src:"premier-ministre-dole"}
+    ],
+    manques: d? d.manques : [
+      `Le croisement de votre projet avec les codes consolidés ne fait ressortir aucun dispositif couvrant précisément « ${kq} » : c'est l'angle mort à documenter.`,
+      "Vérifier si un texte en navette pourrait servir de véhicule législatif avant de partir d'une page blanche.",
+      "Identifier les questions écrites restées sans réponse satisfaisante : elles matérialisent le vide juridique."
+    ],
+    risques: construireRisques(txt, d),
+    adaptations: d? d.adapt : [
+      "Qualifier le niveau de compétence de chaque blocage : loi, décret d'application, arrêté, doctrine administrative ou droit européen — un décret manquant se débloque sans changer la loi",
+      "Vérifier s'il existe un cadre d'expérimentation mobilisable (bac à sable réglementaire, droit à la différenciation)",
+      "Demander un rescrit à l'administration compétente pour sécuriser l'interprétation du droit existant",
+      "Documenter la conformité aux cadres transversaux (RGPD, AI Act le cas échéant) avant tout déploiement"
+    ],
+    leviers: d? d.leviers : [["PPL","Proposition de loi ad hoc"],["Amendement","Amendement à un texte en navette"],["Question écrite","Question écrite pour faire constater le vide par le Gouvernement"],["Pétition","Pétition sur la plateforme officielle de l'AN"]],
+    commission: d? d.commission : ""
+  };
+}
+
+/* ---------- Rendu ---------- */
+function esc(s){const d=document.createElement("div");d.textContent=s;return d.innerHTML;}
+function li(html){return `<li>${html}</li>`;}
+
+function ligneDoc(t, ancre){
+  const lien = t.lien ? `<br><a href="${t.lien}" target="_blank" rel="noopener">${ancre} →</a>` : "";
+  return li(`<b>${esc(t.titre)}</b>${t.detail?" — "+esc(t.detail):""}${lien}<span class="src">✺ ${t.src}</span>`);
+}
+function rendre(a){
+  $("ulTextes").innerHTML = a.textes.map(t=>ligneDoc(t,"Consulter le texte")).join("");
+  $("ulDebats").innerHTML = a.debats.map(t=>ligneDoc(t,"Voir la source")).join("");
+  $("ulManque").innerHTML = a.manques.map((m,i)=>li(`<span class="tag-manque">Friction ${i+1}</span>${esc(m)}`)).join("");
+  const actions = [
+    ...(a.adaptations||[]).map(x=>`<span class="levier-type adapt">S'adapter</span>${esc(x)}`),
+    ...a.leviers.map(l=>`<span class="levier-type">${esc(l[0])}</span>${esc(l[1])}`)
+  ];
+  $("ulLeviers").innerHTML = actions.map(li).join("");
+  $("ulRisques").innerHTML = (a.risques||[]).map(r=>li(`<span class="tag-risque">${esc(r[0])}</span>${esc(r[1])}<span class="piste-leg">Garde-fou possible : ${esc(r[2])}</span>`)).join("");
+  const n = $("noticeTransparence");
+  if(a.mode==="connecte"){
+    n.innerHTML = "<b>Sources en direct :</b> les blocs « textes » et « débats » ci-dessus proviennent de l'API unifiée an-et-co (Canutes — AN, Sénat, Légifrance, Service public). Les blocs « angle mort » et « leviers » restent une lecture heuristique locale : croisez-les avec les documents sourcés. Le raisonnement IA complet arrive avec le branchement MCP.";
+  } else if(a.mode==="erreur-api"){
+    n.innerHTML = "<b>API configurée mais injoignable</b> (CORS, jeton ou URL à vérifier — voir les pastilles rouges dans « Sources »). Fiche générée en mode démonstration locale, avec liens réels vers les sources officielles.";
+  } else {
+    n.innerHTML = "<b>Transparence :</b> en mode démonstration, cette fiche est générée localement à partir de votre texte, avec des liens réels vers les sources officielles. Branchez l'API unifiée an-et-co dans le panneau « Sources » ci-dessous pour des résultats interrogés en direct.";
+  }
+}
+
+function genererNote(a){
+  const objet = projetTexte.split(/[.!?\n]/)[0].trim().slice(0,180);
+  const resume = projetTexte.trim().slice(0,450);
+  const ul = items => `<ul>${items}</ul>`;
+  const appuis = a.textes.map(t=>`<li>${esc(t.titre)}${t.detail?" — "+esc(t.detail):""}</li>`).join("");
+  const frictions = a.manques.map(m=>`<li>${esc(m)}</li>`).join("");
+  const actions = (a.adaptations||[]).map(x=>`<li>${esc(x)}</li>`).join("");
+  const attentes = a.leviers.map(l=>`<li><b>${esc(l[0])}</b>&nbsp;: ${esc(l[1])}</li>`).join("");
+  return `
+  <h4>NOTE DE PRÉSENTATION D'UN PROJET CITOYEN</h4>
+  <div class="rf">À L'ATTENTION DE MADAME LA DÉPUTÉE / MONSIEUR LE DÉPUTÉ</div>
+  <p style="text-align:center"><i>Objet&nbsp;: ${esc(objet)} — état du droit, frictions identifiées et évolutions législatives souhaitées</i></p>
+
+  <h5>1. Ce que fait le projet</h5>
+  <p>${esc(resume)}${projetTexte.length>450?"…":""}</p>
+
+  <h5>2. Ce que la loi permet déjà — et sur quoi le projet s'appuie</h5>
+  ${ul(appuis)}
+
+  <h5>3. Les limites que le projet rencontre</h5>
+  <p>À l'usage, le projet se heurte aux points de friction suivants&nbsp;— vérifiés sur les textes en vigueur et les travaux parlementaires&nbsp;:</p>
+  ${ul(frictions)}
+
+  <h5>4. Les actions que nous menons dans le cadre actuel</h5>
+  <p>Nous ne demandons pas une dispense du droit&nbsp;: nous mobilisons déjà ce qu'il permet.</p>
+  ${ul(actions)}
+
+  <h5>5. Les risques que nous identifions — et les garde-fous que la loi pourrait poser</h5>
+  <p>Nous préférons présenter nous-mêmes les risques du projet plutôt que de les laisser découvrir en crise. Pour chacun, nous proposons un garde-fou législatif allant dans le sens du bien-être collectif&nbsp;:</p>
+  ${ul((a.risques||[]).map(r=>`<li><b>${esc(r[0])}</b>&nbsp;: ${esc(r[1])} <i>Garde-fou possible&nbsp;: ${esc(r[2])}</i></li>`).join(""))}
+
+  <h5>6. Les ruptures qui restent à combler — et à quel niveau</h5>
+  <p>Nous avons cherché à qualifier le niveau de compétence de chaque friction&nbsp;: certaines pourraient relever d'un décret d'application, d'un arrêté ou de la doctrine administrative — auquel cas une question écrite au Gouvernement peut suffire à les lever. Mais celles décrites au point&nbsp;3 nous paraissent relever de la loi elle-même&nbsp;: aucune action de notre niveau ne peut les résoudre. C'est là que le débat législatif doit prendre de l'avance — notre cas est concret aujourd'hui, il sera collectif demain. Cette pré-analyse demande naturellement à être confirmée par vos services&nbsp;: elle ne se substitue pas à l'expertise juridique.</p>
+
+  <h5>7. Ce que nous attendons de vous</h5>
+  <p>Selon le véhicule qui vous paraîtra le plus opportun&nbsp;:</p>
+  ${ul(attentes)}
+  <p>Nous nous tenons à votre disposition, ainsi qu'à celle de vos collaborateurs, pour présenter le projet, ses données et ses partenaires, en circonscription ou à l'Assemblée.</p>
+
+  <p style="margin-top:18px">[Vos nom, qualité, structure et coordonnées]</p>
+  ${a.commission?`<p style="margin-top:16px;font-size:.85rem;color:#5A6474"><i>Commission compétente pressentie&nbsp;: ${esc(a.commission)}. Sources&nbsp;: données ouvertes de l'Assemblée nationale et de Légifrance — fiche d'analyse jointe.</i></p>`:""}`;
+}
+
+/* ---------- Interactions ---------- */
+document.querySelectorAll(".chip").forEach(c=>c.addEventListener("click",()=>{ $("pitch").value = EXEMPLES[c.dataset.ex]; }));
+
+const dz=$("dz"), fi=$("fileInput");
+dz.addEventListener("click",()=>fi.click());
+dz.addEventListener("dragover",e=>{e.preventDefault();dz.classList.add("over");});
+dz.addEventListener("dragleave",()=>dz.classList.remove("over"));
+dz.addEventListener("drop",e=>{e.preventDefault();dz.classList.remove("over");if(e.dataTransfer.files[0])chargerFichier(e.dataTransfer.files[0]);});
+fi.addEventListener("change",()=>{if(fi.files[0])chargerFichier(fi.files[0]);});
+
+/* ---- Extraction de texte dans le navigateur (.pptx .docx .pdf .txt .md) ---- */
+function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=()=>rej(new Error("CDN inaccessible : "+src));document.head.appendChild(s);});}
+function decodeEntities(s){const t=document.createElement("textarea");t.innerHTML=s;return t.value;}
+
+async function extraireZipXml(f, filtre, regex){
+  if(!window.JSZip) await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js");
+  const zip = await JSZip.loadAsync(f);
+  const noms = Object.keys(zip.files).filter(n=>filtre.test(n))
+    .sort((a,b)=>(parseInt((a.match(/\d+/)||[0])[0])-parseInt((b.match(/\d+/)||[0])[0])));
+  const out = [];
+  for(const n of noms){
+    const xml = await zip.files[n].async("string");
+    const morceaux = [...xml.matchAll(regex)].map(m=>m[1]).filter(Boolean);
+    if(morceaux.length) out.push(morceaux.join(" "));
+  }
+  return out.join("\n\n");
+}
+const extrairePptx = f => extraireZipXml(f, /^ppt\/slides\/slide\d+\.xml$/, /<a:t[^>]*>([^<]*)<\/a:t>/g);
+const extraireDocx = f => extraireZipXml(f, /^word\/document\.xml$/, /<w:t[^>]*>([^<]*)<\/w:t>/g);
+
+async function extrairePdf(f){
+  if(!window.pdfjsLib){
+    await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js");
+    pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  }
+  const pdf = await pdfjsLib.getDocument({data: await f.arrayBuffer()}).promise;
+  const out = [];
+  for(let i=1;i<=Math.min(pdf.numPages,25);i++){
+    const tc = await (await pdf.getPage(i)).getTextContent();
+    out.push(tc.items.map(it=>it.str).join(" "));
+  }
+  return out.join("\n\n");
+}
+
+async function chargerFichier(f){
+  const chip=$("fileChip");
+  chip.style.display="inline-block";
+  chip.textContent="⏳ Lecture de "+f.name+"…";
+  try{
+    let txt="";
+    if(/\.(txt|md)$/i.test(f.name))      txt = await f.text();
+    else if(/\.pptx$/i.test(f.name))     txt = await extrairePptx(f);
+    else if(/\.docx$/i.test(f.name))     txt = await extraireDocx(f);
+    else if(/\.pdf$/i.test(f.name))      txt = await extrairePdf(f);
+    else if(/\.(ppt|doc)$/i.test(f.name)){ chip.textContent="⚠ "+f.name+" — ancien format Office. Réenregistrez-le en .pptx / .docx puis rechargez-le."; return; }
+    else { chip.textContent="⚠ "+f.name+" — format non pris en charge (.pptx .pdf .docx .txt .md)"; return; }
+    txt = decodeEntities(txt).replace(/[ \t]+/g," ").replace(/\n{3,}/g,"\n\n").trim();
+    if(!txt){ chip.textContent="⚠ "+f.name+" — aucun texte lisible (document scanné ou images seules ?). Collez un résumé dans le champ."; return; }
+    $("pitch").value = txt.slice(0,6000);
+    chip.textContent="✓ "+f.name+" — texte extrait ("+txt.split(/\s+/).length+" mots). Cliquez « Analyser mon projet ».";
+    $("pitch").scrollIntoView({behavior:"smooth",block:"center"});
+  }catch(e){
+    console.error(e);
+    chip.textContent="⚠ Lecture impossible de "+f.name+" ("+e.message+"). Collez le texte directement dans le champ.";
+  }
+}
+
+$("btnAnalyse").addEventListener("click", async ()=>{
+  projetTexte = $("pitch").value.trim();
+  if(projetTexte.length<30){ alert("Décrivez votre projet en quelques phrases (ou chargez un fichier) pour lancer l'analyse."); return; }
+  setStep(2);
+  $("zoneAnalyse").classList.remove("hidden");
+  $("blocs").classList.add("hidden");
+  $("loader").classList.remove("hidden");
+  $("resumeProjet").textContent = "Projet analysé : « " + projetTexte.slice(0,160) + (projetTexte.length>160?"…":"") + " »";
+  $("zoneAnalyse").scrollIntoView({behavior:"smooth"});
+  const [a] = await Promise.all([analyser(projetTexte), new Promise(r=>setTimeout(r,1400))]);
+  analyse = a;
+  $("loader").classList.add("hidden");
+  $("blocs").classList.remove("hidden");
+  rendre(a);
+});
+
+$("btnPPL").addEventListener("click",()=>{
+  setStep(3);
+  $("zonePPL").classList.remove("hidden");
+  $("pplDoc").innerHTML = genererNote(analyse);
+  if(analyse.commission){ [...$("selCom").options].forEach(o=>{ if(o.text===analyse.commission) o.selected=true; }); }
+  $("zonePPL").scrollIntoView({behavior:"smooth"});
+});
+
+$("btnCopy").addEventListener("click",async ()=>{
+  await navigator.clipboard.writeText($("pplDoc").innerText);
+  $("btnCopy").textContent="✓ Copié"; setTimeout(()=>$("btnCopy").textContent="⧉ Copier le texte",1800);
+});
+$("btnDl").addEventListener("click",()=>{
+  const blob=new Blob([$("pplDoc").innerText],{type:"text/plain;charset=utf-8"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="note-presentation-depute.txt";a.click();
+});
+
+$("btnTransmit").addEventListener("click",()=>{
+  setStep(4);
+  $("zoneTransmit").classList.remove("hidden");
+  $("zoneTransmit").scrollIntoView({behavior:"smooth"});
+});
+
+$("btnMail").addEventListener("click",()=>{
+  const dest=$("depEmail").value.trim();
+  const nom=$("depNom").value.trim();
+  const com=$("selCom").value;
+  const sujet="Projet citoyen — présentation et évolutions législatives souhaitées"+(com?" ("+com+")":"");
+  const corps=(nom?"À l'attention de "+nom+",\n\n":"Madame la Députée, Monsieur le Député,\n\n")
+    +"Je porte un projet qui rencontre des frictions avec le droit en vigueur. La note ci-dessous — préparée avec l'outil Éclaireur, sur les données ouvertes de l'Assemblée nationale et de Légifrance — présente le projet, ce que la loi permet déjà, les limites rencontrées, les actions que nous menons, et ce que nous attendons de vous.\n\n"
+    +"--- NOTE DE PRÉSENTATION ---\n"+$("pplDoc").innerText
+    +"\n\nBien respectueusement,";
+  location.href="mailto:"+encodeURIComponent(dest)+"?subject="+encodeURIComponent(sujet)+"&body="+encodeURIComponent(corps.slice(0,1800)+(corps.length>1800?"\n\n[Texte complet joint — brouillon tronqué pour l'email]":""));
+});
+
+function setStep(n){
+  for(let i=1;i<=4;i++){
+    const s=$("st"+i);
+    s.classList.toggle("active",i===n);
+    s.classList.toggle("done",i<n);
+  }
+}
+
+/* ---------- Sources & branchement ---------- */
+$("pills").innerHTML = DATASETS.map(d=>`<span class="pill ${d[2]?"on":"off"}" data-id="${d[0]}" title="${d[0]}"><span class="dot"></span>${d[1]}</span>`).join("");
+
+(function initConf(){
+  const c = getConf();
+  if(c.base) $("apiBase").value = c.base;
+  if(c.token) $("apiToken").value = c.token;
+  if(c.template) $("apiTpl").value = c.template;
+  if(c.base){ $("apiStatus").textContent = "Configuration mémorisée — cliquez « Connecter & tester » pour vérifier."; }
+})();
+
+$("btnConnect").addEventListener("click", async ()=>{
+  const conf = { base:$("apiBase").value.trim(), token:$("apiToken").value.trim(), template:$("apiTpl").value.trim()||"/search?q={q}&source={source}" };
+  const st = $("apiStatus");
+  if(!conf.base){ st.className="err"; st.textContent="Indiquez l'URL de base de l'API."; return; }
+  setConf(conf);
+  st.className=""; st.textContent="Test en cours…";
+  setPillsGroupe(["an-et-co-api-regroupement-toutes-donnees"],"wait");
+  try{
+    const j = await requeteSource(conf,"premier-ministre-legi","loi");
+    const n = normaliser(j).length;
+    st.className="ok"; st.textContent="✓ API joignable"+(n?` — ${n} résultat(s) au test. Lancez une analyse !`:" — réponse reçue mais format inattendu : ajustez le gabarit selon la doc.");
+    setPillsGroupe(["an-et-co-api-regroupement-toutes-donnees","an-et-co-database-regroupement-toutes-donnees","an-et-co-serveur-mcp-regroupement-toutes-donnees"],"ok");
+  }catch(e){
+    st.className="err";
+    st.textContent="✗ Échec ("+e.message+"). Vérifiez l'URL, le jeton, le gabarit — ou une restriction CORS côté API.";
+    setPillsGroupe(["an-et-co-api-regroupement-toutes-donnees"],"err");
+  }
+});
+</script>
+</body>
+</html>
