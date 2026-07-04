@@ -431,7 +431,7 @@ footer a{color:#fff}
           <button class="btn ghost" id="btnConnect">🔌 Connecter &amp; tester</button>
           <span id="apiStatus"></span>
         </div>
-        <p class="src-note">La documentation de l'API est sur <a href="https://www.tricoteuses.fr/services/api-canutes-legifrance/documentation" target="_blank" rel="noopener">tricoteuses.fr</a> (protégée par un anti-robot : ouvrez-la dans votre navigateur). Collez l'URL de base ci-dessus et ajustez le gabarit — <code>{q}</code> = mots-clés, <code>{source}</code> = identifiant du jeu de données. Configuration mémorisée dans votre navigateur uniquement.</p>
+        <p class="src-note"><b>Déjà branché par défaut :</b> le site interroge l'API Parlement publique <code>parlement.tricoteuses.fr</code> (questions au Gouvernement, débats) sans aucune configuration. Ce panneau sert à brancher l'accès complet (LEGI, DOLE, JORF, dossiers, amendements) via l'API Canutes ou votre proxy <code>api.php</code> — <code>{q}</code> = mots-clés, <code>{source}</code> = jeu de données. Configuration mémorisée dans votre navigateur uniquement.</p>
       </div>
       <div class="src-pills" id="pills"></div>
       <div class="legende-pills">
@@ -509,28 +509,53 @@ const DATASETS = [
 const SOURCES_TEXTES = DATASETS.filter(d=>d[3]==="textes").map(d=>d[0]);
 const SOURCES_DEBATS = DATASETS.filter(d=>d[3]==="debats").map(d=>d[0]);
 
-/* ---- Requête générique vers l'API unifiée ---- */
+/* ---- API Parlement publique (tricoteuses.fr) : interrogée PAR DÉFAUT, sans configuration ---- */
+const PARLEMENT_API = "https://parlement.tricoteuses.fr";
+const PARLEMENT_MAP = {
+  "an-questions-gouvernement": "/questions/json?search={q}&perPage=3&sort=dateDepot.desc",
+  "an-comptes-rendus": "/debats/json?search={q}&perPage=3"
+};
+
+function urlPourSource(conf, source, q){
+  if(conf && conf.base){
+    return conf.base.replace(/\/+$/,"") + (conf.template||"/search?q={q}&source={source}")
+      .replace("{q}",encodeURIComponent(q))
+      .replace("{source}",encodeURIComponent(source));
+  }
+  const p = PARLEMENT_MAP[source];
+  return p ? PARLEMENT_API + p.replace("{q}",encodeURIComponent(q)) : null;
+}
+
+/* ---- Requête générique ---- */
 async function requeteSource(conf, source, q){
-  const chemin = (conf.template||"/search?q={q}&source={source}")
-    .replace("{q}",encodeURIComponent(q))
-    .replace("{source}",encodeURIComponent(source));
+  const url = urlPourSource(conf, source, q);
+  if(!url) throw new Error("source non exposée en HTTP");
   const ctrl = new AbortController(); setTimeout(()=>ctrl.abort(), 12000);
-  const r = await fetch(conf.base.replace(/\/+$/,"") + chemin, {
+  const r = await fetch(url, {
     signal: ctrl.signal,
-    headers: Object.assign({Accept:"application/json"}, conf.token?{Authorization:"Bearer "+conf.token}:{})
+    headers: Object.assign({Accept:"application/json"}, (conf&&conf.token)?{Authorization:"Bearer "+conf.token}:{})
   });
   if(!r.ok) throw new Error("HTTP "+r.status);
   return await r.json();
 }
 
-/* Normalise les réponses aux formes JSON les plus courantes */
+/* Normalise les réponses aux formes JSON les plus courantes,
+   dont le format de l'API Parlement (questions, débats). */
 function normaliser(json){
   const arr = Array.isArray(json) ? json : (json.results||json.items||json.hits||json.data||json.documents||json.records||[]);
-  return (Array.isArray(arr)?arr:[]).slice(0,4).map(o=>({
-    titre: String(o.titre||o.title||o.libelle||o.nom||o.name||o.intitule||"Document").slice(0,140),
-    detail: String(o.extrait||o.resume||o.description||o.summary||o.objet||o.texte||o.snippet||"").replace(/<[^>]+>/g,"").slice(0,200),
-    lien: String(o.url||o.lien||o.link||o.href||o.uri||"")
-  })).filter(x=>x.titre!=="Document"||x.detail||x.lien);
+  return (Array.isArray(arr)?arr:[]).slice(0,3).map(o=>{
+    let titre = o.titre||o.title||o.libelle||o.nom||o.name||o.intitule||"";
+    if(!titre && o.type && o.numero) titre = "Question "+o.type+" n°"+o.numero+(o.rubrique?" — "+o.rubrique:"")+(o.libelleCloture?" ("+o.libelleCloture+")":"");
+    if(!titre && o.uid) titre = String(o.uid);
+    let lien = o.url||o.lien||o.link||o.href||o.uri||"";
+    if(!lien && o.chambre==="AN" && o.numero && o.type && o.dataset)
+      lien = "https://questions.assemblee-nationale.fr/q"+o.dataset+"/"+o.dataset+"-"+o.numero+o.type+".htm";
+    return {
+      titre: String(titre||"Document").slice(0,140),
+      detail: String(o.extrait||o.resume||o.description||o.summary||o.objet||o.texteQuestion||o.texte||o.snippet||"").replace(/<[^>]+>/g,"").slice(0,220),
+      lien: String(lien)
+    };
+  }).filter(x=>x.titre!=="Document"||x.detail||x.lien);
 }
 
 /* ---- Statuts visuels des sources ---- */
@@ -620,11 +645,12 @@ function detecterDomaine(txt){
 async function analyser(txt){
   const conf = getConf();
   const base = analyserLocal(txt);
-  if(!conf.base) return base;
 
-  /* Interroge en parallèle les 9 sources documentaires cochées via l'API unifiée */
+  /* Interroge en parallèle les sources accessibles : API Parlement publique
+     par défaut, API Canutes complète (ou proxy api.php) si configurée. */
   const kq = base.kws.slice(0,3).join(" ");
-  const cibles = [...SOURCES_TEXTES, ...SOURCES_DEBATS];
+  const cibles = [...SOURCES_TEXTES, ...SOURCES_DEBATS].filter(s=>urlPourSource(conf,s,"test"));
+  if(!cibles.length) return base;
   setPillsGroupe(cibles,"wait");
   const reponses = await Promise.allSettled(cibles.map(s=>requeteSource(conf,s,kq)));
   const libelle = id => (DATASETS.find(d=>d[0]===id)||[,id])[1];
@@ -648,7 +674,8 @@ async function analyser(txt){
   if(!okCount) { base.mode="erreur-api"; return base; } /* API injoignable : repli démo */
   base.mode="connecte";
   if(reels.textes.length) base.textes = reels.textes.slice(0,5);
-  if(reels.debats.length) base.debats = reels.debats.slice(0,6);
+  /* résultats en direct d'abord, complétés par les pistes de recherche locales */
+  if(reels.debats.length) base.debats = [...reels.debats.slice(0,4), ...base.debats.slice(0,2)];
   return base;
 }
 
@@ -723,11 +750,11 @@ function rendre(a){
   $("ulRisques").innerHTML = (a.risques||[]).map(r=>li(`<span class="tag-risque">${esc(r[0])}</span>${esc(r[1])}<span class="piste-leg">Garde-fou possible : ${esc(r[2])}</span>`)).join("");
   const n = $("noticeTransparence");
   if(a.mode==="connecte"){
-    n.innerHTML = "<b>Sources en direct :</b> les blocs « textes » et « débats » ci-dessus proviennent de l'API unifiée an-et-co (Canutes — AN, Sénat, Légifrance, Service public). Les blocs « angle mort » et « leviers » restent une lecture heuristique locale : croisez-les avec les documents sourcés. Le raisonnement IA complet arrive avec le branchement MCP.";
+    n.innerHTML = "<b>Sources en direct :</b> les questions et débats parlementaires ci-dessus sont interrogés en temps réel via l'API Parlement (an-et-co / tricoteuses.fr) — chaque ligne renvoie à sa source officielle. Les blocs « frictions », « risques » et « agir » restent une pré-analyse heuristique : croisez-les avec les documents sourcés. L'IA éclaire, l'humain décide.";
   } else if(a.mode==="erreur-api"){
-    n.innerHTML = "<b>API configurée mais injoignable</b> (CORS, jeton ou URL à vérifier — voir les pastilles rouges dans « Sources »). Fiche générée en mode démonstration locale, avec liens réels vers les sources officielles.";
+    n.innerHTML = "<b>API injoignable</b> (réseau, CORS ou configuration — voir les pastilles rouges dans « Sources »). Fiche générée en mode démonstration locale, avec liens réels vers les sources officielles. Si le blocage est CORS, passez par le proxy api.php fourni.";
   } else {
-    n.innerHTML = "<b>Transparence :</b> en mode démonstration, cette fiche est générée localement à partir de votre texte, avec des liens réels vers les sources officielles. Branchez l'API unifiée an-et-co dans le panneau « Sources » ci-dessous pour des résultats interrogés en direct.";
+    n.innerHTML = "<b>Transparence :</b> fiche générée localement à partir de votre texte, avec liens réels vers les sources officielles. Les questions et débats parlementaires s'interrogent en direct dès que le réseau le permet (API Parlement an-et-co).";
   }
 }
 
@@ -914,7 +941,17 @@ $("pills").innerHTML = DATASETS.map(d=>`<span class="pill ${d[2]?"on":"off"}" da
 $("btnConnect").addEventListener("click", async ()=>{
   const conf = { base:$("apiBase").value.trim(), token:$("apiToken").value.trim(), template:$("apiTpl").value.trim()||"/search?q={q}&source={source}" };
   const st = $("apiStatus");
-  if(!conf.base){ st.className="err"; st.textContent="Indiquez l'URL de base de l'API."; return; }
+  if(!conf.base){
+    try{ localStorage.removeItem(API_CONF_KEY); }catch(e){}
+    st.className="ok";
+    st.textContent="✓ Configuration effacée — retour au branchement par défaut (API Parlement publique, sans configuration).";
+    return;
+  }
+  if(/\/mcp\/?$/.test(conf.base)){
+    st.className="err";
+    st.textContent="✗ Ceci est une URL de serveur MCP (pour les assistants IA), pas une API REST. Laissez le champ vide : l'API Parlement publique est déjà branchée par défaut.";
+    return;
+  }
   setConf(conf);
   st.className=""; st.textContent="Test en cours…";
   setPillsGroupe(["an-et-co-api-regroupement-toutes-donnees"],"wait");
